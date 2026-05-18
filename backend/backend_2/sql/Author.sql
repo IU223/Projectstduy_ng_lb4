@@ -1,0 +1,9 @@
+CREATE TABLE author (
+  author_id VARCHAR(255) PRIMARY KEY NOT NULL,
+  name VARCHAR(255),
+  password VARCHAR(255),
+  email VARCHAR(255),
+  avatar VARCHAR(255),
+  created_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE
+);
