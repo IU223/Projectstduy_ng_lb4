@@ -17,19 +17,19 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Author} from '../models';
-import {AuthorRepository} from '../repositories';
+import { Author } from '../models';
+import { AuthorRepository } from '../repositories';
 
 export class AuthorController {
   constructor(
     @repository(AuthorRepository)
-    public authorRepository : AuthorRepository,
-  ) {}
+    public authorRepository: AuthorRepository,
+  ) { }
 
   @post('/authors')
   @response(200, {
     description: 'Author model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Author)}},
+    content: { 'application/json': { schema: getModelSchemaRef(Author) } },
   })
   async create(
     @requestBody({
@@ -37,7 +37,7 @@ export class AuthorController {
         'application/json': {
           schema: getModelSchemaRef(Author, {
             title: 'NewAuthor',
-            
+
           }),
         },
       },
@@ -50,7 +50,7 @@ export class AuthorController {
   @get('/authors/count')
   @response(200, {
     description: 'Author model count',
-    content: {'application/json': {schema: CountSchema}},
+    content: { 'application/json': { schema: CountSchema } },
   })
   async count(
     @param.where(Author) where?: Where<Author>,
@@ -65,7 +65,7 @@ export class AuthorController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Author, {includeRelations: true}),
+          items: getModelSchemaRef(Author, { includeRelations: true }),
         },
       },
     },
@@ -79,20 +79,24 @@ export class AuthorController {
   @patch('/authors')
   @response(200, {
     description: 'Author PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
+    content: { 'application/json': { schema: { type: 'object', properties: { message: { type: 'string' }, data: { type: 'array', items: getModelSchemaRef(Author) } } } } },
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Author, {partial: true}),
+          schema: getModelSchemaRef(Author, { partial: true }),
         },
       },
     })
     author: Author,
     @param.where(Author) where?: Where<Author>,
-  ): Promise<Count> {
-    return this.authorRepository.updateAll(author, where);
+  ): Promise<{ message: string, data: Author[] }> {
+
+    const result = await this.authorRepository.updateAll(author, where);
+    console.log(result);
+    return { message: `${result.count} record(s) updated successfully`, data: await this.authorRepository.find({ where }) };
+
   }
 
   @get('/authors/{id}')
@@ -100,13 +104,13 @@ export class AuthorController {
     description: 'Author model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(Author, {includeRelations: true}),
+        schema: getModelSchemaRef(Author, { includeRelations: true }),
       },
     },
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Author, {exclude: 'where'}) filter?: FilterExcludingWhere<Author>
+    @param.filter(Author, { exclude: 'where' }) filter?: FilterExcludingWhere<Author>
   ): Promise<Author> {
     return this.authorRepository.findById(id, filter);
   }
@@ -120,7 +124,7 @@ export class AuthorController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Author, {partial: true}),
+          schema: getModelSchemaRef(Author, { partial: true }),
         },
       },
     })
